@@ -27,8 +27,7 @@ if (!firebase_admin_1.default.apps.length) {
         }
         catch (error) {
             console.error("--> FATAL ERROR: Failed to parse FIREBASE_SERVICE_ACCOUNT JSON.", error);
-            console.error("--> RAW VALUE (First 50 chars):", env_1.ENV.FIREBASE_SERVICE_ACCOUNT.substring(0, 50));
-            // Do not exit immediately, let it crash naturally or try default
+            // Fallthrough to dummy init if needed, or crash later
         }
     }
     else {
@@ -38,13 +37,20 @@ if (!firebase_admin_1.default.apps.length) {
                 credential: firebase_admin_1.default.credential.applicationDefault(),
                 projectId: env_1.ENV.FIREBASE_PROJECT_ID,
             });
-            console.log("Firebase initialized with default credentials.");
+            console.log("--> Firebase initialized with default credentials.");
         }
         catch (error) {
-            console.error("CRITICAL: Failed to initialize with applicationDefault().");
-            console.error("On non-GCP environments (like Render/Heroku), you MUST set FIREBASE_SERVICE_ACCOUNT.");
-            console.error("Error details:", error);
-            process.exit(1);
+            console.error("--> CRITICAL: Failed to initialize with applicationDefault().");
+            console.error("--> On non-GCP environments (like Render/Heroku), you MUST set FIREBASE_SERVICE_ACCOUNT.");
+            console.error("--> Error details:", error);
+            // DO NOT EXIT. Initialize a dummy app to prevent 'admin.firestore()' from throwing.
+            try {
+                console.log("--> WARNING: Initializing DUMMY Firebase app to keep server alive.");
+                firebase_admin_1.default.initializeApp({ projectId: 'failed-init-dummy' });
+            }
+            catch (e) {
+                console.error("--> EVEN DUMMY INIT FAILED:", e);
+            }
         }
     }
 }
