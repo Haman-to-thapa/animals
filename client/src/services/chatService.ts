@@ -151,11 +151,14 @@ export const chatService = {
         );
 
         return onSnapshot(q, (snapshot) => {
+            if (!snapshot) return; // Guard against null snapshot
             const chats = snapshot.docs.map((doc: FirebaseFirestoreTypes.QueryDocumentSnapshot) => ({
                 id: doc.id,
                 ...doc.data()
             })) as Chat[];
             callback(chats);
+        }, (error) => {
+            console.error('Adoption chat listener error:', error);
         });
     },
 

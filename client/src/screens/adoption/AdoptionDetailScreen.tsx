@@ -131,7 +131,14 @@ const AdoptionDetailScreen = () => {
                             <Text style={styles.name}>{adoption.petName}</Text>
                             <Text style={styles.breed}>{adoption.petBreed}</Text>
                         </View>
-                        <Text style={styles.age}>Age: {adoption.petAge}</Text>
+                        <View style={{ alignItems: 'flex-end' }}>
+                            <Text style={styles.age}>Age: {adoption.petAge}</Text>
+                            {adoption.isFree ? (
+                                <Text style={styles.freeBadge}>Free Adoption</Text>
+                            ) : (
+                                <Text style={styles.price}>{adoption.currency} {adoption.price}</Text>
+                            )}
+                        </View>
                     </View>
 
                     <View style={styles.locationContainer}>
@@ -315,6 +322,22 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         paddingVertical: 6,
         borderRadius: 12,
+        marginBottom: 4,
+    },
+    freeBadge: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#FFF',
+        backgroundColor: '#4CAF50',
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 8,
+        overflow: 'hidden',
+    },
+    price: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#333',
     },
     locationContainer: {
         flexDirection: 'row',

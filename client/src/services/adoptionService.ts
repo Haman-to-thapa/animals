@@ -24,6 +24,9 @@ export const adoptionService = {
                 status: 'available',
                 reportCount: 0,
                 createdAt: serverTimestamp(),
+                price: petData.price || 0,
+                currency: petData.currency || 'USD',
+                isFree: petData.isFree || false,
             });
             return true;
         } catch (error) {

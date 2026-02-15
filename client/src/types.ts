@@ -69,6 +69,9 @@ export interface Adoption {
     petImageBase64?: string;
     location: string;
     status: 'available' | 'pending' | 'adopted' | 'removed';
+    price?: number;
+    currency?: string;
+    isFree: boolean;
     reportCount: number;
     createdAt: any;
 }

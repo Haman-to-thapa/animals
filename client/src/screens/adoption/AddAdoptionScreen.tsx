@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Image, ActivityIndicator, Alert, SafeAreaView, Platform } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Image, ActivityIndicator, Alert, SafeAreaView, Platform, Modal, FlatList } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { adoptionService } from '../../services/adoptionService';
+import { currencyList } from '../../utils/currencyList';
 
 const AddAdoptionScreen = () => {
     const navigation = useNavigation();
@@ -17,6 +18,10 @@ const AddAdoptionScreen = () => {
     const [breed, setBreed] = useState('');
     const [location, setLocation] = useState('');
     const [description, setDescription] = useState('');
+    const [price, setPrice] = useState('');
+    const [currency, setCurrency] = useState('USD');
+    const [isFree, setIsFree] = useState(true);
+    const [currencyModalVisible, setCurrencyModalVisible] = useState(false);
 
     const pickImage = async () => {
         const result = await launchImageLibrary({
@@ -37,6 +42,11 @@ const AddAdoptionScreen = () => {
             return;
         }
 
+        if (!isFree && !price) {
+            Alert.alert('Error', 'Please enter a price for paid adoptions.');
+            return;
+        }
+
         setLoading(true);
         try {
             await adoptionService.createAdoption({
@@ -45,6 +55,9 @@ const AddAdoptionScreen = () => {
                 petBreed: breed,
                 location: location,
                 petDescription: description,
+                isFree,
+                price: isFree ? 0 : parseFloat(price),
+                currency: isFree ? 'USD' : currency
             }, imageBase64);
 
             Alert.alert('Success', 'Your pet is now listed and visible to everyone! 🐾', [
@@ -109,6 +122,49 @@ const AddAdoptionScreen = () => {
                         </View>
                     </View>
 
+                    <Text style={styles.label}>Adoption Fee</Text>
+                    <View style={styles.radioContainer}>
+                        <TouchableOpacity
+                            style={[styles.radioBtn, isFree && styles.radioBtnActive]}
+                            onPress={() => { setIsFree(true); setPrice(''); }}
+                        >
+                            <Ionicons name={isFree ? "radio-button-on" : "radio-button-off"} size={20} color={isFree ? "#4CAF50" : "#666"} />
+                            <Text style={[styles.radioText, isFree && styles.radioTextActive]}>Free Adoption</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={[styles.radioBtn, !isFree && styles.radioBtnActive]}
+                            onPress={() => setIsFree(false)}
+                        >
+                            <Ionicons name={!isFree ? "radio-button-on" : "radio-button-off"} size={20} color={!isFree ? "#4CAF50" : "#666"} />
+                            <Text style={[styles.radioText, !isFree && styles.radioTextActive]}>Sell / Paid</Text>
+                        </TouchableOpacity>
+                    </View>
+
+                    {!isFree && (
+                        <View style={styles.row}>
+                            <View style={[styles.inputContainer, { marginRight: 8, flex: 0.4 }]}>
+                                <Text style={styles.label}>Currency</Text>
+                                <TouchableOpacity
+                                    style={styles.currencySelector}
+                                    onPress={() => setCurrencyModalVisible(true)}
+                                >
+                                    <Text style={styles.currencyText}>{currency}</Text>
+                                    <Ionicons name="chevron-down" size={16} color="#666" />
+                                </TouchableOpacity>
+                            </View>
+                            <View style={[styles.inputContainer, { marginLeft: 8 }]}>
+                                <Text style={styles.label}>Price</Text>
+                                <TextInput
+                                    style={styles.input}
+                                    placeholder="0.00"
+                                    value={price}
+                                    onChangeText={setPrice}
+                                    keyboardType="numeric"
+                                />
+                            </View>
+                        </View>
+                    )}
+
                     <Text style={styles.label}>Location</Text>
                     <TextInput
                         style={styles.input}
@@ -140,6 +196,40 @@ const AddAdoptionScreen = () => {
                     </TouchableOpacity>
                 </View>
             </ScrollView>
+
+            <Modal
+                visible={currencyModalVisible}
+                animationType="slide"
+                transparent={true}
+                onRequestClose={() => setCurrencyModalVisible(false)}
+            >
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalContent}>
+                        <View style={styles.modalHeader}>
+                            <Text style={styles.modalTitle}>Select Currency</Text>
+                            <TouchableOpacity onPress={() => setCurrencyModalVisible(false)}>
+                                <Ionicons name="close" size={24} color="#333" />
+                            </TouchableOpacity>
+                        </View>
+                        <FlatList
+                            data={currencyList}
+                            keyExtractor={(item) => item.code}
+                            renderItem={({ item }) => (
+                                <TouchableOpacity
+                                    style={styles.currencyItem}
+                                    onPress={() => {
+                                        setCurrency(item.code);
+                                        setCurrencyModalVisible(false);
+                                    }}
+                                >
+                                    <Text style={styles.currencyItemText}>{item.code} - {item.name} ({item.symbol})</Text>
+                                    {currency === item.code && <Ionicons name="checkmark" size={20} color="#4CAF50" />}
+                                </TouchableOpacity>
+                            )}
+                        />
+                    </View>
+                </View>
+            </Modal>
         </SafeAreaView>
     );
 };
@@ -236,6 +326,84 @@ const styles = StyleSheet.create({
     },
     disabled: {
         backgroundColor: '#A5D6A7',
+    },
+    radioContainer: {
+        flexDirection: 'row',
+        marginBottom: 16,
+    },
+    radioBtn: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginRight: 24,
+        padding: 8,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#EEE',
+    },
+    radioBtnActive: {
+        borderColor: '#4CAF50',
+        backgroundColor: '#E8F5E9',
+    },
+    radioText: {
+        marginLeft: 8,
+        fontSize: 14,
+        color: '#666',
+    },
+    radioTextActive: {
+        color: '#4CAF50',
+        fontWeight: 'bold',
+    },
+    currencySelector: {
+        backgroundColor: '#F5F5F5',
+        borderRadius: 12,
+        padding: 14,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 16,
+    },
+    currencyText: {
+        fontSize: 16,
+        color: '#333',
+        fontWeight: 'bold',
+    },
+    modalContainer: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        justifyContent: 'flex-end',
+    },
+    modalContent: {
+        backgroundColor: '#FFF',
+        borderTopLeftRadius: 24,
+        borderTopRightRadius: 24,
+        padding: 20,
+        height: '70%',
+    },
+    modalHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 20,
+        paddingBottom: 16,
+        borderBottomWidth: 1,
+        borderBottomColor: '#EEE',
+    },
+    modalTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#333',
+    },
+    currencyItem: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingVertical: 16,
+        borderBottomWidth: 1,
+        borderBottomColor: '#F5F5F5',
+    },
+    currencyItemText: {
+        fontSize: 16,
+        color: '#333',
     }
 });
 
