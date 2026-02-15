@@ -1,19 +1,25 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import TabNavigator from './TabNavigator';
 import AuthNavigator from './AuthNavigator';
 import { useAuth } from '../auth/AuthContext';
-import { View, ActivityIndicator } from 'react-native';
+import SplashScreen from '../screens/SplashScreen';
 
 export default function Navigation() {
   const { user, initializing } = useAuth();
+  const [showSplash, setShowSplash] = useState(true);
 
-  if (initializing) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center' }}>
-        <ActivityIndicator />
-      </View>
-    );
+  useEffect(() => {
+    // Show splash screen for 2.5 seconds
+    const timer = setTimeout(() => {
+      setShowSplash(false);
+    }, 2500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (showSplash || initializing) {
+    return <SplashScreen />;
   }
 
   return (

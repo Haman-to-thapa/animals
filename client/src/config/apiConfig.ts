@@ -5,6 +5,8 @@ import { Platform } from 'react-native';
 const DEV_API_URL = 'http://localhost:4001';
 
 // Replace with your actual production URL
-const PROD_API_URL = 'https://animals-wfh4.onrender.com';
+const PROD_API_URL = 'https://animals-2.onrender.com';
 
-export const API_BASE_URL = __DEV__ ? DEV_API_URL : PROD_API_URL;
+// For testing Render deployment, we force PROD_API_URL
+export const API_BASE_URL = PROD_API_URL;
+// export const API_BASE_URL = __DEV__ ? DEV_API_URL : PROD_API_URL;

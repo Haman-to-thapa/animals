@@ -54,7 +54,7 @@ const HelpChatScreen = () => {
 
         try {
 
-            // Replace with your actual backend URL
+
             const response = await axios.post(`${API_BASE_URL}/ai/chat`, {
                 message: userMsg.text
             });

@@ -34,7 +34,7 @@ const SocialScreen = () => {
       setPosts(prev => reset ? newPosts : [...prev, ...newPosts]);
       setLastDoc(result.lastDoc);
 
-      // Async batch check for likes to avoid blocking render
+
       if (user) {
         socialService.batchLikeCheck(newPosts.map(p => p.id)).then(likeMap => {
           setPosts(current => current.map(p =>
@@ -154,7 +154,7 @@ const SocialScreen = () => {
           maxToRenderPerBatch={8}
           windowSize={5}
           getItemLayout={(data, index) => ({
-            length: 480, // Approximate height of SocialPostCard
+            length: 480,
             offset: 480 * index,
             index,
           })}

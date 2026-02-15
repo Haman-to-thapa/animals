@@ -12,7 +12,7 @@ const AddAdoptionScreen = () => {
     const [imageUri, setImageUri] = useState<string | null>(null);
     const [imageBase64, setImageBase64] = useState<string | null>(null);
 
-    // Form State
+
     const [name, setName] = useState('');
     const [age, setAge] = useState('');
     const [breed, setBreed] = useState('');

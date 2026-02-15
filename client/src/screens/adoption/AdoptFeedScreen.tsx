@@ -128,7 +128,7 @@ const AdoptFeedScreen = () => {
                             </TouchableOpacity>
                         </View>
                     }
-                    // Performance optimizations for low-end devices
+
                     removeClippedSubviews={Platform.OS === 'android'}
                     initialNumToRender={6}
                     maxToRenderPerBatch={10}
@@ -185,10 +185,10 @@ const styles = StyleSheet.create({
     listContent: {
         paddingHorizontal: 12,
         paddingTop: 12,
-        paddingBottom: 120, // Space for FAB
+        paddingBottom: 120,
     },
     row: {
-        justifyContent: 'space-between', // Evenly space the 2 columns
+        justifyContent: 'space-between',
     },
     empty: {
         flex: 1,
@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
     },
     fab: {
         position: 'absolute',
-        bottom: 90, // Above tab bar
+        bottom: 90,
         right: 20,
         width: 56,
         height: 56,

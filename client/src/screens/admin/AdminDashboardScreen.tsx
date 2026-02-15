@@ -43,7 +43,7 @@ const AdminDashboardScreen = ({ navigation }: any) => {
             if (tab === 'reports') {
                 result = await moderationService.getReports();
             } else if (tab === 'users') {
-                // Users need specific query
+
                 let q = query(collection(db, 'users'), orderBy('createdAt', 'desc'), limit(PAGE_SIZE));
                 if (isLoadMore && currentData.lastDoc) {
                     q = query(q, startAfter(currentData.lastDoc));
@@ -127,21 +127,21 @@ const AdminDashboardScreen = ({ navigation }: any) => {
         let targetId = item.id;
         let targetOwnerId = ownerId;
 
-        // Special handling for reports tab
+
         if (activeTab === 'reports') {
             colName = item.postType ? colMap[item.postType] : null;
-            targetId = item.postId; // Delete the actual post, not the report (deleteContent cleans reports)
-            targetOwnerId = item.ownerId; // Send msg to the post owner, not the reporter
+            targetId = item.postId;
+            targetOwnerId = item.ownerId;
         } else {
             colName = colName || (item.postType ? colMap[item.postType] : null);
         }
 
         if (!colName) {
-            // Alert.alert('Error', `Could not determine collection for type: ${item.postType || activeTab}`);
+
             return;
         }
 
-        // Optimistic Update
+
         setCache(prev => ({
             ...prev,
             [activeTab]: {
@@ -163,7 +163,7 @@ const AdminDashboardScreen = ({ navigation }: any) => {
     }, [activeTab, fetchData]);
 
     const handleIgnore = useCallback(async (id: string) => {
-        // Optimistic Update
+
         setCache(prev => ({
             ...prev,
             reports: {
@@ -247,13 +247,13 @@ const AdminDashboardScreen = ({ navigation }: any) => {
                 ListEmptyComponent={!loading ? <Text style={styles.empty}>No items found.</Text> : (
                     <ActivityIndicator style={{ marginTop: 50 }} color="#4CAF50" />
                 )}
-                // Optimizations
+
                 removeClippedSubviews={true}
                 initialNumToRender={PAGE_SIZE}
                 maxToRenderPerBatch={PAGE_SIZE}
                 windowSize={5}
                 getItemLayout={(data, index) => ({
-                    length: 120, // Approx height of AdminCard
+                    length: 120,
                     offset: 120 * index,
                     index,
                 })}

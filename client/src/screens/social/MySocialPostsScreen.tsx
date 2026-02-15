@@ -25,7 +25,7 @@ const MySocialPostsScreen = ({ navigation }: any) => {
     }, []);
 
     const handleLike = async (postId: string) => {
-        // Basic optimistic update or just refresh
+
         try {
             await socialService.likePost(postId);
             fetchMyPosts();
@@ -36,7 +36,7 @@ const MySocialPostsScreen = ({ navigation }: any) => {
         <SocialPostCard
             post={item}
             onLike={() => handleLike(item.id)}
-            onComment={() => { }} // Could navigate to comments
+            onComment={() => { }}
             onReport={() => { }}
         />
     );

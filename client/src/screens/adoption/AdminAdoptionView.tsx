@@ -126,7 +126,7 @@ const AdminAdoptionView = () => {
                     maxToRenderPerBatch={10}
                     windowSize={5}
                     getItemLayout={(data, index) => ({
-                        length: 220, // Approximate height of card + margin
+                        length: 220,
                         offset: 220 * Math.floor(index / 2),
                         index,
                     })}

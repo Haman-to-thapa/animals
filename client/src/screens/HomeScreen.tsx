@@ -93,7 +93,7 @@ const CenterAnimalImage = memo(() => {
         />
         <View style={styles.imageOverlay}>
           <Text style={styles.imageCaption}>Family</Text>
-          <Text style={styles.subCaption}>Show your dog sound & picture</Text>
+          <Text style={styles.subCaption}>Show your Animals sound & picture</Text>
         </View>
       </View>
     </View>

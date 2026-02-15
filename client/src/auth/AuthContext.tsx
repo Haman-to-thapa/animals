@@ -37,7 +37,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return subscriber;
   }, [auth]);
 
-  // Sync profile from Firestore
+
   useEffect(() => {
     if (!user) {
       setProfile(null);
@@ -51,7 +51,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setProfile(data);
       } else {
 
-        // Auto-create profile for new user
+
         const newProfile: any = {
           uid: user.uid,
           email: user.email,
@@ -74,12 +74,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (!user) return;
     await setDoc(doc(db, 'users', user.uid), data, { merge: true });
 
-    // Also update Auth profile for displayName
+
     if (data.displayName) {
       await user.updateProfile({ displayName: data.displayName });
     }
 
-    // Sync across all user content (posts, animals, comments)
+
     try {
       await userService.syncProfileData(user.uid, data);
     } catch (e) {

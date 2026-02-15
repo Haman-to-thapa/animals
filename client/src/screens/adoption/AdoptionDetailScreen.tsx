@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
     },
     scrollViewContent: {
         flexGrow: 1,
-        paddingBottom: 20, // Add some padding at the bottom
+        paddingBottom: 20,
     },
     image: {
         width: width,
@@ -296,7 +296,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#FFF',
         borderTopLeftRadius: 32,
         borderTopRightRadius: 32,
-        paddingBottom: 100, // Extra padding to ensure content doesn't hide behind buttons
+        paddingBottom: 100,
     },
     mainInfo: {
         flexDirection: 'row',
