@@ -9,22 +9,25 @@ if (ENV.FIREBASE_PROJECT_ID && !process.env.GCLOUD_PROJECT) {
 }
 
 if (!admin.apps.length) {
+    console.log("--> CHECKING FIREBASE CONFIG <--");
+    console.log(`--> FIREBASE_SERVICE_ACCOUNT exists? ${!!ENV.FIREBASE_SERVICE_ACCOUNT}`);
     if (ENV.FIREBASE_SERVICE_ACCOUNT) {
+        console.log(`--> FIREBASE_SERVICE_ACCOUNT length: ${ENV.FIREBASE_SERVICE_ACCOUNT.length}`);
         try {
-            console.log("Found FIREBASE_SERVICE_ACCOUNT, attempting to parse...");
+            console.log("--> Attempting to parse JSON...");
             const serviceAccount = JSON.parse(ENV.FIREBASE_SERVICE_ACCOUNT);
-            console.log("Successfully parsed service account. Project ID:", serviceAccount.project_id);
+            console.log("--> JSON Parsed. Project ID:", serviceAccount.project_id);
             admin.initializeApp({
                 credential: admin.credential.cert(serviceAccount),
             });
-            console.log("Firebase initialized with Service Account.");
+            console.log("--> Firebase initialized with Service Account. SUCCESS.");
         } catch (error) {
-            console.error("CRITICAL: Failed to parse FIREBASE_SERVICE_ACCOUNT JSON.", error);
-            console.error("Ensure the environment variable does not have extra quotes and is valid JSON.");
-            process.exit(1);
+            console.error("--> FATAL ERROR: Failed to parse FIREBASE_SERVICE_ACCOUNT JSON.", error);
+            console.error("--> RAW VALUE (First 50 chars):", ENV.FIREBASE_SERVICE_ACCOUNT.substring(0, 50));
+            // Do not exit immediately, let it crash naturally or try default
         }
     } else {
-        console.log("FIREBASE_SERVICE_ACCOUNT not set. Attempting applicationDefault() credential...");
+        console.log("--> FIREBASE_SERVICE_ACCOUNT not set. Attempting applicationDefault()...");
         try {
             admin.initializeApp({
                 credential: admin.credential.applicationDefault(),

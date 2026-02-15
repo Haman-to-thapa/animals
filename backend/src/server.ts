@@ -1,4 +1,6 @@
 import app from "./app";
+console.log("--> SERVER SCRIPT STARTED <--");
+
 import { ENV } from "./config/env";
 import { initCronJobs } from "./services/cronService";
 
