@@ -3,7 +3,19 @@ import Groq from 'groq-sdk';
 import dotenv from 'dotenv';
 dotenv.config();
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+// Lazy initialization to prevent startup crashes if key is missing
+let groq: Groq | null = null;
+
+const getGroqClient = () => {
+    if (!groq) {
+        if (!process.env.GROQ_API_KEY) {
+            console.error("--> ERROR: GROQ_API_KEY is missing!");
+            throw new Error("GROQ_API_KEY is missing");
+        }
+        groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+    }
+    return groq;
+};
 
 export const getAIHelpResponse = async (req: Request, res: Response) => {
     try {
@@ -14,7 +26,8 @@ export const getAIHelpResponse = async (req: Request, res: Response) => {
             return res.status(400).json({ error: 'Message is required' });
         }
 
-        const chatCompletion = await groq.chat.completions.create({
+        const client = getGroqClient();
+        const chatCompletion = await client.chat.completions.create({
             messages: [
                 {
                     role: 'system',
