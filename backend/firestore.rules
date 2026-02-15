@@ -1,0 +1,44 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if user is admin (custom claim or specific UID)
+    // For simplicity in this demo, strict admin check is omitted or relies on a specific UID list
+    function isAdmin() {
+      return request.auth != null && request.auth.token.email == "admin@animal.com"; 
+    }
+
+    function isAuth() {
+      return request.auth != null;
+    }
+
+    // Animals Collection: Public Read (if approved), Authenticated Create, Admin Update/Delete
+    match /animals/{animalId} {
+      allow read: if resource.data.status == 'approved' || isAdmin();
+      allow create: if isAuth();
+      allow update, delete: if isAdmin();
+    }
+
+    // Adoptions
+    match /adoptions/{adoptionId} {
+      allow read: if isAuth();
+      allow create: if isAuth();
+      allow update: if isAuth() && (request.auth.uid == resource.data.ownerId || isAdmin());
+      allow delete: if isAdmin();
+    }
+
+    // Adoption Requests
+    match /adoption_requests/{requestId} {
+      allow create: if isAuth();
+      allow read: if isAuth() && (request.auth.uid == resource.data.requesterId || request.auth.uid == resource.data.ownerId || isAdmin());
+      allow update: if isAuth() && (request.auth.uid == resource.data.ownerId || isAdmin());
+      allow delete: if isAdmin();
+    }
+
+    // Adoption Reports
+    match /adoption_reports/{reportId} {
+      allow create: if isAuth();
+      allow read, update, delete: if isAdmin();
+    }
+  }
+}

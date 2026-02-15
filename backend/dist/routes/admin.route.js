@@ -1,0 +1,13 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const auth_middleware_1 = require("../middlewares/auth.middleware");
+const admin_middleware_1 = require("../middlewares/admin.middleware");
+const admin_controller_1 = require("../controllers/admin.controller");
+const router = (0, express_1.Router)();
+router.use(auth_middleware_1.authenticate, admin_middleware_1.adminOnly);
+router.get("/reports", admin_controller_1.getReports);
+router.post("/content/visibility", admin_controller_1.setContentVisibility);
+router.post("/user/block", admin_controller_1.blockUserAdmin);
+router.post("/adoption/approve", admin_controller_1.approveAdoption);
+exports.default = router;

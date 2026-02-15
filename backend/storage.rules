@@ -1,0 +1,13 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    match /animals/{userId}/{fileName} {
+      // Anyone can read
+      allow read: if true; 
+      
+      // Only authenticated users can upload (20MB limit)
+      allow write: if request.auth != null && request.resource.size < 20 * 1024 * 1024;
+    }
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "813757467530",
+    "project_id": "animals-6b2c2",
+    "storage_bucket": "animals-6b2c2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:813757467530:android:5d6d2e24a2f51125541673",
+        "android_client_info": {
+          "package_name": "com.client"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "813757467530-8o3lvlcnsntn4sntq1ga0u8o6v6mo1hr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.client",
+            "certificate_hash": "ea1c87b050b9fdd49483d2d3698f53180c1abcb0"
+          }
+        },
+        {
+          "client_id": "813757467530-3gdlotkqff29hujloojtgfugbn3timve.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAtwAUEAYo38fZw5B39WIXyF1mxDkpQzqM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "813757467530-3gdlotkqff29hujloojtgfugbn3timve.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
