@@ -25,13 +25,17 @@ const getAIHelpResponse = async (req, res) => {
                     content: message
                 }
             ],
-            model: 'llama3-8b-8192',
+            model: 'llama-3.1-8b-instant',
         });
-        res.json({ reply: chatCompletion.choices[0]?.message?.content || 'Sorry, I could not understand that.' });
+        const reply = chatCompletion.choices[0]?.message?.content;
+        res.json({ reply: reply || 'Sorry, I could not understand that.' });
     }
     catch (error) {
         console.error('Groq AI Error:', error);
-        res.status(500).json({ error: 'Failed to fetch AI response' });
+        res.status(500).json({
+            error: 'Failed to fetch AI response',
+            details: error.message
+        });
     }
 };
 exports.getAIHelpResponse = getAIHelpResponse;
