@@ -7,14 +7,26 @@ exports.getAIHelpResponse = void 0;
 const groq_sdk_1 = __importDefault(require("groq-sdk"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
-const groq = new groq_sdk_1.default({ apiKey: process.env.GROQ_API_KEY });
+// Lazy initialization to prevent startup crashes if key is missing
+let groq = null;
+const getGroqClient = () => {
+    if (!groq) {
+        if (!process.env.GROQ_API_KEY) {
+            console.error("--> ERROR: GROQ_API_KEY is missing!");
+            throw new Error("GROQ_API_KEY is missing");
+        }
+        groq = new groq_sdk_1.default({ apiKey: process.env.GROQ_API_KEY });
+    }
+    return groq;
+};
 const getAIHelpResponse = async (req, res) => {
     try {
         const { message } = req.body;
         if (!message) {
             return res.status(400).json({ error: 'Message is required' });
         }
-        const chatCompletion = await groq.chat.completions.create({
+        const client = getGroqClient();
+        const chatCompletion = await client.chat.completions.create({
             messages: [
                 {
                     role: 'system',

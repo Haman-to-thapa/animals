@@ -9,4 +9,6 @@ dotenv_1.default.config();
 exports.ENV = {
     PORT: process.env.PORT || 4000,
     NODE_ENV: process.env.NODE_ENV || "development",
+    FIREBASE_SERVICE_ACCOUNT: process.env.FIREBASE_SERVICE_ACCOUNT,
+    FIREBASE_PROJECT_ID: process.env.FIREBASE_PROJECT_ID || process.env.GCLOUD_PROJECT,
 };
