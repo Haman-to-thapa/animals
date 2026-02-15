@@ -9,7 +9,6 @@ let groq: Groq | null = null;
 const getGroqClient = () => {
     if (!groq) {
         if (!process.env.GROQ_API_KEY) {
-            console.error("--> ERROR: GROQ_API_KEY is missing!");
             throw new Error("GROQ_API_KEY is missing");
         }
         groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
