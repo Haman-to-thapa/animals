@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc",
-    "start": "echo 'STARTING BACKEND...' && node dist/server.js"
+    "start": "ls -l dist/server.js && node dist/server.js"
   },
   "keywords": [],
   "author": "",
