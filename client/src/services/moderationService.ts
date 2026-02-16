@@ -140,5 +140,13 @@ export const moderationService = {
         const db = getFirestore();
         // Delete user document (clean up posts/animals separately or via trigger if possible)
         await deleteDoc(doc(db, 'users', userId));
+    },
+
+    changeUserRole: async (userId: string, newRole: 'user' | 'admin') => {
+        const db = getFirestore();
+        await updateDoc(doc(db, 'users', userId), {
+            role: newRole
+        });
+        return true;
     }
 };

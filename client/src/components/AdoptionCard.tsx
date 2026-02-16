@@ -70,12 +70,12 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
-        width: '48%', // Flexible width for 2 columns
-        marginHorizontal: '1%', // Small equal spacing
+        width: '48%',
+        marginHorizontal: '1%',
     },
     image: {
         width: '100%',
-        height: 160, // Slightly taller for better view
+        height: 160,
         backgroundColor: '#F5F5F5',
     },
     ownerBadge: {

@@ -8,10 +8,10 @@ import { animalService } from '../services/animalService';
 import AnimalCard from '../components/AnimalCard';
 import AnimalCardSkeleton from '../components/AnimalCardSkeleton';
 import UploadModal from '../components/UploadModal';
+import AnimalDetailModal from '../components/AnimalDetailModal';
 import { Animal } from '../types';
 
 const EMOTIONS = ['All', 'Happy', 'Angry', 'Lazy', 'Rude', 'Sad', 'Cute'];
-
 
 interface FilterChipProps {
   item: string;
@@ -38,7 +38,6 @@ const FilterChip = memo(({ item, filter, onPress }: FilterChipProps) => {
     </TouchableOpacity>
   );
 });
-
 
 interface ListHeaderProps {
   filter: string;
@@ -69,7 +68,6 @@ const ListHeader = memo(({ filter, onFilterPress }: ListHeaderProps) => {
     </View>
   );
 });
-
 
 const CenterAnimalImage = memo(() => {
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -109,7 +107,8 @@ function HomeScreen() {
   const [permissionError, setPermissionError] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [currentPlayingId, setCurrentPlayingId] = useState<string | null>(null);
-
+  const [selectedAnimal, setSelectedAnimal] = useState<Animal | null>(null);
+  const [detailVisible, setDetailVisible] = useState(false);
 
   const animalsCount = useMemo(() => animals.length, [animals]);
 
@@ -127,7 +126,6 @@ function HomeScreen() {
       setAnimals(prev => reset ? result.animals : [...prev, ...result.animals]);
       setLastDoc(result.lastDoc);
     } catch (error: any) {
-
       if (error.code === 'firestore/permission-denied') {
         setPermissionError(true);
       }
@@ -171,6 +169,10 @@ function HomeScreen() {
     fetchAnimals(true);
   }, [fetchAnimals]);
 
+  const handleCardPress = useCallback((animal: Animal) => {
+    setSelectedAnimal(animal);
+    setDetailVisible(true);
+  }, []);
 
   const renderAnimalCard = useCallback(({ item }: { item: any }) => (
     <AnimalCard
@@ -178,9 +180,9 @@ function HomeScreen() {
       isPlaying={currentPlayingId === item.id}
       onPlay={handlePlay}
       onPause={handlePause}
+      onPress={handleCardPress}
     />
-  ), [currentPlayingId, handlePlay, handlePause]);
-
+  ), [currentPlayingId, handlePlay, handlePause, handleCardPress]);
 
   const listHeaderComponent = useMemo(() => (
     <>
@@ -263,20 +265,14 @@ function HomeScreen() {
         numColumns={2}
         columnWrapperStyle={styles.row}
         contentContainerStyle={styles.listContent}
-
-
         initialNumToRender={4}
         maxToRenderPerBatch={4}
         windowSize={3}
         removeClippedSubviews={true}
         onEndReached={handleEndReached}
         onEndReachedThreshold={0.3}
-
-
         refreshing={refreshing}
         onRefresh={handleRefresh}
-
-
         updateCellsBatchingPeriod={50}
         disableVirtualization={false}
         pagingEnabled={false}
@@ -295,6 +291,12 @@ function HomeScreen() {
         visible={uploadVisible}
         onClose={() => setUploadVisible(false)}
         onSuccess={handleUploadSuccess}
+      />
+
+      <AnimalDetailModal
+        visible={detailVisible}
+        animal={selectedAnimal}
+        onClose={() => setDetailVisible(false)}
       />
     </View>
   );

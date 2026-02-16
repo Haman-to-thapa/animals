@@ -4,11 +4,12 @@ import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 interface AdminCardProps {
     item: any;
     activeTab: string;
-    onAction: (item: any, action: 'approve' | 'reject' | 'delete' | 'ban') => void;
+    onAction: (item: any, action: 'approve' | 'reject' | 'delete' | 'ban' | 'changeRole', payload?: any) => void;
     onIgnore?: (id: string) => void;
+    currentUserId?: string;
 }
 
-const AdminCard = ({ item, activeTab, onAction, onIgnore }: AdminCardProps) => {
+const AdminCard = ({ item, activeTab, onAction, onIgnore, currentUserId }: AdminCardProps) => {
     const isUser = activeTab === 'users';
     const imageUri = isUser
         ? (item.photoURL || item.imageUrl || null)
@@ -50,7 +51,18 @@ const AdminCard = ({ item, activeTab, onAction, onIgnore }: AdminCardProps) => {
 
                     {isUser ? (
                         item.status !== 'banned' && (
-                            <View style={{ flexDirection: 'row' }}>
+                            <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                                {item.id !== currentUserId && (
+                                    item.role === 'admin' ? (
+                                        <TouchableOpacity onPress={() => onAction(item, 'changeRole', 'user')} style={[styles.btn, styles.deleteBtn, { backgroundColor: '#FFC107' }]}>
+                                            <Text style={styles.btnText}>Demote</Text>
+                                        </TouchableOpacity>
+                                    ) : (
+                                        <TouchableOpacity onPress={() => onAction(item, 'changeRole', 'admin')} style={[styles.btn, styles.approveBtn, { backgroundColor: '#2196F3' }]}>
+                                            <Text style={styles.btnText}>Promote</Text>
+                                        </TouchableOpacity>
+                                    )
+                                )}
                                 <TouchableOpacity onPress={() => onAction(item, 'ban')} style={[styles.btn, styles.deleteBtn, { backgroundColor: '#FF9800' }]}>
                                     <Text style={styles.btnText}>Ban</Text>
                                 </TouchableOpacity>

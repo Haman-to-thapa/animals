@@ -4,6 +4,7 @@ import { launchImageLibrary } from 'react-native-image-picker';
 import auth from '@react-native-firebase/auth';
 import { pick, types, keepLocalCopy } from '@react-native-documents/picker';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import Video from 'react-native-video';
 import { animalService } from '../services/animalService';
 
 interface UploadModalProps {
@@ -22,6 +23,7 @@ const UploadModal: React.FC<UploadModalProps> = ({ visible, onClose, onSuccess }
     const [imageBase64, setImageBase64] = useState<string | null>(null);
     const [audioUri, setAudioUri] = useState<string | null>(null);
     const [uploading, setUploading] = useState(false);
+    const [checkingAudio, setCheckingAudio] = useState(false);
 
     const resetForm = () => {
         setName('');
@@ -31,6 +33,7 @@ const UploadModal: React.FC<UploadModalProps> = ({ visible, onClose, onSuccess }
         setImageBase64(null);
         setAudioUri(null);
         setUploading(false);
+        setCheckingAudio(false);
     };
 
     const pickImage = async () => {
@@ -68,15 +71,36 @@ const UploadModal: React.FC<UploadModalProps> = ({ visible, onClose, onSuccess }
             const copiedFile = results[0];
             if (copiedFile.status === 'success' && copiedFile.localUri) {
                 setAudioUri(copiedFile.localUri);
+                setCheckingAudio(true);
             } else {
                 Alert.alert('Audio Error', 'Could not prepare audio file for upload.');
             }
         } catch (err) {
-            // Error handled by picker
         }
     };
 
+    const handleAudioLoad = (data: any) => {
+        setCheckingAudio(false);
+        if (data.duration > 25) {
+            Alert.alert(
+                'Audio Too Long',
+                'Audio must be 25 seconds or less.',
+                [{ text: 'OK', onPress: () => setAudioUri(null) }]
+            );
+        }
+    };
+
+    const handleAudioError = () => {
+        setCheckingAudio(false);
+        Alert.alert('Audio Error', 'Could not validate audio file.');
+        setAudioUri(null);
+    };
+
     const handleSubmit = async () => {
+        if (checkingAudio) {
+            return;
+        }
+
         if (!name || !description || !selectedEmotion || !imageUri || !audioUri) {
             Alert.alert('Missing Fields', 'Please fill all fields and upload both image and audio.');
             return;
@@ -151,17 +175,35 @@ const UploadModal: React.FC<UploadModalProps> = ({ visible, onClose, onSuccess }
 
                             <TouchableOpacity style={styles.mediaButton} onPress={pickAudio}>
                                 <Ionicons name="musical-note-outline" size={24} color="#555" />
-                                <Text style={styles.mediaText}>{audioUri ? 'Audio Selected' : 'Add Audio'}</Text>
+                                <Text style={styles.mediaText}>
+                                    {checkingAudio ? 'Checking...' : (audioUri ? 'Audio Selected' : 'Add Audio')}
+                                </Text>
                             </TouchableOpacity>
                         </View>
 
+                        {audioUri && (
+                            <Video
+                                source={{ uri: audioUri }}
+                                onLoad={handleAudioLoad}
+                                onError={handleAudioError}
+                                paused={true}
+                                style={{ width: 0, height: 0, position: 'absolute' }}
+                            />
+                        )}
+
                         {imageUri && <Image source={{ uri: imageUri }} style={styles.previewImage} />}
 
-                        <TouchableOpacity style={styles.submitButton} onPress={handleSubmit} disabled={uploading}>
+                        <TouchableOpacity
+                            style={[styles.submitButton, (uploading || checkingAudio) && styles.disabledButton]}
+                            onPress={handleSubmit}
+                            disabled={uploading || checkingAudio}
+                        >
                             {uploading ? (
                                 <ActivityIndicator color="#FFF" />
                             ) : (
-                                <Text style={styles.submitText}>Submit Animal</Text>
+                                <Text style={styles.submitText}>
+                                    {checkingAudio ? 'Checking Audio...' : 'Submit Animal'}
+                                </Text>
                             )}
                         </TouchableOpacity>
                     </ScrollView>
@@ -273,6 +315,9 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         alignItems: 'center',
         elevation: 2,
+    },
+    disabledButton: {
+        backgroundColor: '#A5D6A7',
     },
     submitText: {
         color: '#FFF',

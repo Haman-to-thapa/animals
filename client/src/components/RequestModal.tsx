@@ -20,7 +20,6 @@ const RequestModal = ({ visible, onClose, onSubmit, petName }: RequestModalProps
             setMessage('');
             onClose();
         } catch (error) {
-            // Error handled in parent
         } finally {
             setLoading(false);
         }

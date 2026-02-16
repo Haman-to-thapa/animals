@@ -17,6 +17,8 @@ interface AnimalCardProps {
     isPlaying: boolean;
     onPlay: (id: string) => void;
     onPause: () => void;
+    onPlayingChange?: (isPlaying: boolean) => void;
+    onPress?: (animal: Animal) => void;
 }
 
 const emotionColors = {
@@ -29,7 +31,7 @@ const emotionColors = {
     Default: '#4CAF50'
 };
 
-const AnimalCard: React.FC<AnimalCardProps> = memo(({ animal, isPlaying, onPlay, onPause }) => {
+const AnimalCard: React.FC<AnimalCardProps> = memo(({ animal, isPlaying, onPlay, onPause, onPress }) => {
     const [loadingAudio, setLoadingAudio] = useState(false);
     const [audioPath, setAudioPath] = useState<string | null>(null);
     const [imageLoaded, setImageLoaded] = useState(false);
@@ -79,7 +81,6 @@ const AnimalCard: React.FC<AnimalCardProps> = memo(({ animal, isPlaying, onPlay,
                 setAudioPath(path);
                 onPlay(animal.id);
             } catch (err) {
-                // Audio load failed
             } finally {
                 setLoadingAudio(false);
             }
@@ -106,7 +107,6 @@ const AnimalCard: React.FC<AnimalCardProps> = memo(({ animal, isPlaying, onPlay,
         setAudioPath(null);
     }, [onPause]);
 
-    // Cleanup audio on unmount
     useEffect(() => {
         return () => {
             if (audioPath) {
@@ -116,7 +116,12 @@ const AnimalCard: React.FC<AnimalCardProps> = memo(({ animal, isPlaying, onPlay,
     }, [audioPath]);
 
     return (
-        <View style={styles.card}>
+        <TouchableOpacity
+            style={styles.card}
+            activeOpacity={0.9}
+            onPress={() => onPress && onPress(animal)}
+            disabled={!onPress}
+        >
             <View style={[styles.imageContainer, { backgroundColor: emotionColor + '20' }]}>
                 {imageSource && !imageError ? (
                     <>
@@ -207,7 +212,7 @@ const AnimalCard: React.FC<AnimalCardProps> = memo(({ animal, isPlaying, onPlay,
                     }}
                 />
             )}
-        </View>
+        </TouchableOpacity>
     );
 });
 

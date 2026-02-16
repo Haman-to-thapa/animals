@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { getAuth, onAuthStateChanged, FirebaseAuthTypes } from '@react-native-firebase/auth';
 import { getFirestore, doc, onSnapshot, setDoc } from '@react-native-firebase/firestore';
 import { userService } from '../services/userService';
+import { notificationService } from '../services/notificationService';
 import { signOut as googleSignOut } from '../auth/googleAuth';
 
 type UserProfile = {
@@ -43,6 +44,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setProfile(null);
       return;
     }
+
+    // Initialize Notifications
+    const initNotifications = async () => {
+      const hasPermission = await notificationService.requestUserPermission();
+      if (hasPermission) {
+        await notificationService.getFCMToken(user.uid);
+        notificationService.setupListeners();
+      }
+    };
+    initNotifications();
 
     const unsub = onSnapshot(doc(db, 'users', user.uid), (snapshot) => {
       if (snapshot.exists()) {

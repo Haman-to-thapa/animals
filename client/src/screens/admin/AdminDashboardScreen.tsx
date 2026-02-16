@@ -17,7 +17,7 @@ interface TabData {
 const PAGE_SIZE = 15;
 
 const AdminDashboardScreen = ({ navigation }: any) => {
-    const { profile, logout } = useAuth();
+    const { profile, user, logout } = useAuth();
     const [activeTab, setActiveTab] = useState<TabType>('animals');
     const [loading, setLoading] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
@@ -68,14 +68,21 @@ const AdminDashboardScreen = ({ navigation }: any) => {
                 lastVisible = snap.docs[snap.docs.length - 1];
             }
 
-            setCache(prev => ({
-                ...prev,
-                [tab]: {
-                    items: isLoadMore ? [...prev[tab].items, ...result] : result,
-                    lastDoc: lastVisible,
-                    hasMore: result.length === PAGE_SIZE
-                }
-            }));
+            setCache(prev => {
+                const existingItems = prev[tab].items;
+                const newItems = isLoadMore
+                    ? [...existingItems, ...result.filter((r: any) => !existingItems.some((i: any) => i.id === r.id))]
+                    : result;
+
+                return {
+                    ...prev,
+                    [tab]: {
+                        items: newItems,
+                        lastDoc: lastVisible,
+                        hasMore: result.length === PAGE_SIZE
+                    }
+                };
+            });
         } catch (error) {
             console.error('Fetch admin error:', error);
             Alert.alert('Error', 'Failed to fetch data');
@@ -94,11 +101,23 @@ const AdminDashboardScreen = ({ navigation }: any) => {
         fetchData(activeTab, false);
     }, [activeTab, fetchData]);
 
-    const handleAction = useCallback(async (item: any, action: 'approve' | 'reject' | 'delete' | 'ban') => {
+    const handleAction = useCallback(async (item: any, action: 'approve' | 'reject' | 'delete' | 'ban' | 'changeRole', payload?: any) => {
         const ownerId = item.uploadedBy || item.ownerId || item.requesterId || item.id;
 
         if (activeTab === 'users') {
-            if (action === 'ban') {
+            if (action === 'changeRole') {
+                setCache(prev => ({
+                    ...prev,
+                    users: { ...prev.users, items: prev.users.items.map((i: any) => i.id === item.id ? { ...i, role: payload } : i) }
+                }));
+                try {
+                    await moderationService.changeUserRole(item.id, payload);
+                    Alert.alert('Success', `User role updated to ${payload}`);
+                } catch (e) {
+                    fetchData('users', false);
+                    Alert.alert('Error', 'Failed to update user role');
+                }
+            } else if (action === 'ban') {
                 setCache(prev => ({
                     ...prev,
                     users: { ...prev.users, items: prev.users.items.map((i: any) => i.id === item.id ? { ...i, status: 'banned', isBlocked: true } : i) }
@@ -194,6 +213,7 @@ const AdminDashboardScreen = ({ navigation }: any) => {
             activeTab={activeTab}
             onAction={handleAction}
             onIgnore={activeTab === 'reports' ? handleIgnore : undefined}
+            currentUserId={user?.uid}
         />
     ), [activeTab, handleAction, handleIgnore]);
 
